@@ -14,8 +14,9 @@ Le décodage est un portage C++ du décodeur rtl_433
 | Décodage de la charge utile (21 octets) | ✅ implémenté et testé |
 | Réassemblage NRZ/PCM (impulsions → bits → trame) | ✅ implémenté et testé |
 | Tests hôte sur trame de référence réelle | ✅ 40 vérifications, 0 échec |
-| Composant ESPHome (`__init__.py`, `sensor.py`, liaison `remote_receiver`) | ⏳ à écrire |
-| YAML cible | ✅ écrit, à valider à la compilation |
+| Composant ESPHome (`__init__.py`, `sensor.py`, liaison `remote_receiver`) | ✅ écrit |
+| YAML cible | ✅ `esphome config` : *Configuration is valid!* (ESPHome 2026.9.1) |
+| Compilation esp-idf | ⏳ en cours |
 | Capture réelle depuis le matériel | ⏳ à faire (déterminera la fréquence réelle) |
 
 ## Structure
@@ -78,14 +79,18 @@ trames corrompues et l'absence de fausse détection sur du bruit.
    documente un centre mesuré que pour la variante US (915.031 MHz), pas pour l'EU.
    La fréquence réelle sera fixée d'après une capture matérielle (balayage
    868.30 / 868.35).
-2. **Liaison CC1101 → ESP32** : le CC1101 est configuré en SPI (mode *async*) et
+2. **`cs_pin` sous `spi:` n'existe pas.** ESPHome 2026.9.1 refuse `spi: cs_pin:`
+   (seules `clk_pin`/`mosi_pin`/`miso_pin` sont acceptées) : le chip select se
+   déclare sur le périphérique, donc sous `cc1101: cs_pin: GPIO7`. Le brochage
+   voulu est conservé.
+3. **Liaison CC1101 → ESP32** : le CC1101 est configuré en SPI (mode *async*) et
    sort la porteuse démodulée sur `GDO0`, câblé sur GPIO3, où `remote_receiver`
    capture les fronts. Le câblage GDO0 = GPIO3 reste à confirmer sur le montage.
-3. **Quantification des impulsions** : le décodeur arrondit chaque durée à
+4. **Quantification des impulsions** : le décodeur arrondit chaque durée à
    `round(durée / période_de_bit)` comme rtl_433. Des longues impulsions très
    bruitées peuvent franchir une borne d'arrondi ; la période est ré-estimée sur
    le préambule, ce qui absorbe un décalage d'horloge émetteur.
-4. La cadence d'émission (une trame toutes les 20 s) sert de base au calcul de la
+5. La cadence d'émission (une trame toutes les 20 s) sert de base au calcul de la
    qualité de signal ; elle est documentée dans la source rtl_433.
 
 ## Licence

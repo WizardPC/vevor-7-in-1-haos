@@ -4,6 +4,9 @@
 # Ce fichier ne contient AUCUNE logique métier : uniquement le câblage, les logs
 # et la déclaration des entités. Tout le décodage vit dans le composant externe
 # components/vevor_7in1/.
+#
+# Version de mise au point : elle pointe sur le composant LOCAL. La version
+# publiée remplace le bloc `source:` par github://WizardPC/vevor-7-in-1-haos@main
 # ---------------------------------------------------------------------------
 
 esphome:
@@ -31,21 +34,27 @@ wifi:
   use_address: 172.16.0.205
 
 external_components:
-  - source: github://WizardPC/vevor-7-in-1-haos@main
+  - source:
+      type: local
+      path: ../components
     components: [vevor_7in1]
-    refresh: 0s
 
 # --- Bus SPI (impose) -------------------------------------------------------
+# ATTENTION : `cs_pin` n'est PAS une option valide du bloc `spi:` en ESPHome
+# 2026.9.1 (le schema n'accepte que clk_pin / mosi_pin / miso_pin). Le chip
+# select se declare sur le peripherique : voir `cc1101: cs_pin`. Le brochage
+# voulu est donc conserve, seul l'emplacement de la cle change.
 spi:
   clk_pin: GPIO4
   mosi_pin: GPIO6
   miso_pin: GPIO5
-  cs_pin:
-    number: GPIO7
 
 # --- Radio CC1101 -----------------------------------------------------------
-# Mode async (par defaut) : le CC1101 demodule et sort le signal sur GDO0,
-# capture par le remote_receiver ci-dessous.
+# Il n'existe pas de key `async_mode` : le mode async est obtenu par
+# `packet_mode: false` (defaut). Le CC1101 demodule alors et sort le signal
+# serie sur GDO0 (registre GDO0_CFG = 0x0D), cable sur GPIO3 ou le
+# remote_receiver capture les fronts. Le lien entre les deux composants est
+# purement materiel.
 cc1101:
   cs_pin: GPIO7
   # HYPOTHESE : la source rtl_433 ne documente un centre mesure que pour la
@@ -56,17 +65,22 @@ cc1101:
   fsk_deviation: 37kHz      # +-37 kHz
   filter_bandwidth: 101kHz  # ~2 x (deviation + debit/2)
   output_power: 8.5         # float en dBm (-30..11) ; sans effet en reception
-  packet_mode: false        # mode async
+  packet_mode: false
 
 # --- Capture des timings bruts (GDO0) ---------------------------------------
 remote_receiver:
   id: rf_receiver
   pin:
     number: GPIO3
-  dump: raw                 # outil de mise au point : a retirer en production
+  dump: raw                 # mise au point : a retirer en production
   idle: 9ms                 # equivalent du reset_limit rtl_433 (9000 us)
+  # `filter` par defaut = 50 us : sans effet sur des bits de 88.8 us, et c'est
+  # volontaire. L'augmenter fusionnerait des impulsions legitimes.
+  receive_symbols: 192      # marge memoire RMT (defaut 96 symboles sur ESP32-C3)
 
 # --- Entites exposees a Home Assistant --------------------------------------
+# Une seule plateforme porte tout (meme approche que `bme280`) : les entites
+# numeriques, binaires et textuelles sont imbriquees sous la meme cle.
 sensor:
   - platform: vevor_7in1
     remote_receiver_id: rf_receiver
@@ -88,8 +102,6 @@ sensor:
       name: "Vevor indice UV"
     illuminance:
       name: "Vevor luminosite"
-    battery_low:
-      name: "Vevor batterie faible"
 
     # Diagnostic
     frame_age:              # watchdog : secondes depuis la derniere trame valide
@@ -103,9 +115,9 @@ sensor:
     bit_period:
       name: "Vevor periode de bit"
 
-text_sensor:
-  - platform: vevor_7in1
-    remote_receiver_id: rf_receiver
+    # Entites non numeriques
+    battery_low:
+      name: "Vevor batterie faible"
     station_id:
       name: "Vevor identifiant"
     last_status:

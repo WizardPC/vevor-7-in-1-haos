@@ -5,8 +5,8 @@
 # et la déclaration des entités. Tout le décodage vit dans le composant externe
 # components/vevor_7in1/.
 #
-# Version de mise au point : elle pointe sur le composant LOCAL. La version
-# publiée remplace le bloc `source:` par github://WizardPC/vevor-7-in-1-haos@main
+# Fichier PUBLIE : le composant est tire directement du depot GitHub. C'est ce
+# fichier qu'un utilisateur copie tel quel.
 # ---------------------------------------------------------------------------
 
 esphome:
@@ -34,10 +34,9 @@ wifi:
   use_address: 172.16.0.205
 
 external_components:
-  - source:
-      type: local
-      path: ../components
+  - source: github://WizardPC/vevor-7-in-1-haos@main
     components: [vevor_7in1]
+    refresh: 0s
 
 # --- Bus SPI (impose) -------------------------------------------------------
 # ATTENTION : `cs_pin` n'est PAS une option valide du bloc `spi:` en ESPHome

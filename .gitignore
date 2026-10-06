@@ -6,3 +6,4 @@ secrets.yaml
 .esphome/
 __pycache__/
 *.pyc
+esphome/vevor-7in1-dev.yaml

@@ -34,6 +34,10 @@ class PcmAssembler {
     uint32_t err_counter{0};
     uint32_t err_header{0};
     uint32_t err_too_short{0};
+    // Sonde du front RF : ce que le récepteur livre réellement.
+    uint32_t last_runs{0};    // impulsions du dernier lot reçu
+    int32_t  last_max_us{0};  // impulsion la plus longue du dernier lot
+    uint64_t total_runs{0};   // impulsions cumulées depuis le démarrage
   };
 
   // Ajoute un lot de durées en µs. Les signes sont ignorés : seule l'alternance

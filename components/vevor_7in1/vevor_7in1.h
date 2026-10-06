@@ -42,6 +42,9 @@ class Vevor7in1Component : public PollingComponent, public remote_base::RemoteRe
   SUB_SENSOR(frames_valid)
   SUB_SENSOR(frames_invalid)
   SUB_SENSOR(bit_period)       // période de bit mesurée, µs (mise au point)
+  SUB_SENSOR(captures)         // lots d'impulsions livrés par le récepteur
+  SUB_SENSOR(last_pulses)      // impulsions du dernier lot
+  SUB_SENSOR(last_max_us)      // impulsion la plus longue du dernier lot, µs
   SUB_TEXT_SENSOR(last_status)
 
  protected:

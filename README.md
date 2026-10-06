@@ -92,12 +92,15 @@ trames corrompues et l'absence de fausse détection sur du bruit.
    le préambule, ce qui absorbe un décalage d'horloge émetteur.
 5. La cadence d'émission (une trame toutes les 20 s) sert de base au calcul de la
    qualité de signal ; elle est documentée dans la source rtl_433.
-6. **`output_power: 8.5dB` appartient au composant `wifi`**, pas au CC1101 : le
-   validateur `cv.decibel` de `wifi` accepte le suffixe `dB` (plage 8,5 – 20,5),
-   tandis que l'`output_power` du CC1101 est un flottant nu en dBm (-30..11) qui
-   rejetterait cette écriture. La valeur est donc sous `wifi:`, au minimum de
-   puissance d'émission Wi-Fi ; le CC1101 garde son défaut (10 dBm), sans effet
-   en réception.
+6. **`output_power` appartient au composant `wifi`**, pas au CC1101 : le
+   validateur de `wifi` est `cv.decibel` (plage 8,5 – 20,5), tandis que
+   l'`output_power` du CC1101 est un flottant nu en dBm (-30..11). La valeur est
+   écrite **sans suffixe d'unité** : `output_power: 8.5`. Elle est volontairement
+   basse — émettre moins fort limite le brouillage du récepteur CC1101 en
+   868 MHz. Contrepartie mesurable : le plafond PHY descend avec elle
+   (`CONFIG_ESP_PHY_MAX_WIFI_TX_POWER` = 10 au lieu de 20), soit ~4× moins de
+   portée Wi-Fi. À garder en tête avant tout flash à distance, d'autant qu'il
+   n'existe pas de section `ap:` de repli.
 
 ## Licence
 

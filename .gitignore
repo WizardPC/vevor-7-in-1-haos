@@ -7,3 +7,4 @@ secrets.yaml
 __pycache__/
 *.pyc
 esphome/vevor-7in1-dev.yaml
+esphome/vevor-7in1-sweep.yaml

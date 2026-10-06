@@ -106,6 +106,20 @@ void Vevor7in1Component::update() {
     this->frames_invalid_sensor_->publish_state(this->frames_invalid_);
   if (this->bit_period_sensor_ != nullptr)
     this->bit_period_sensor_->publish_state(this->assembler_.bit_us());
+  if (this->captures_sensor_ != nullptr)
+    this->captures_sensor_->publish_state(this->assembler_.stats().captures);
+  if (this->last_pulses_sensor_ != nullptr)
+    this->last_pulses_sensor_->publish_state(this->assembler_.stats().last_runs);
+  if (this->last_max_us_sensor_ != nullptr)
+    this->last_max_us_sensor_->publish_state(this->assembler_.stats().last_max_us);
+
+  // Journal périodique de la sonde RF : distingue « rien n'arrive » de
+  // « il arrive quelque chose que le décodeur ne reconnaît pas ».
+  ESP_LOGD(TAG, "captures=%u impulsions=%llu dernier_lot=%u plus_longue=%d us, periode=%.2f us",
+           this->assembler_.stats().captures,
+           static_cast<unsigned long long>(this->assembler_.stats().total_runs),
+           this->assembler_.stats().last_runs, this->assembler_.stats().last_max_us,
+           this->assembler_.bit_us());
 }
 
 }  // namespace esphome::vevor_7in1

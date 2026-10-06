@@ -56,6 +56,9 @@ CONF_SIGNAL_QUALITY = "signal_quality"
 CONF_FRAMES_VALID = "frames_valid"
 CONF_FRAMES_INVALID = "frames_invalid"
 CONF_BIT_PERIOD = "bit_period"
+CONF_CAPTURES = "captures"
+CONF_LAST_PULSES = "last_pulses"
+CONF_LAST_MAX_US = "last_max_us"
 CONF_LAST_STATUS = "last_status"
 
 # (clé de configuration, accesseur C++ généré par la macro SUB_SENSOR)
@@ -172,6 +175,21 @@ _SENSORS = (
         CONF_BIT_PERIOD,
         "set_bit_period_sensor",
         dict(unit_of_measurement="us", accuracy_decimals=2, icon="mdi:sine-wave"),
+    ),
+    (
+        CONF_CAPTURES,
+        "set_captures_sensor",
+        dict(accuracy_decimals=0, state_class=STATE_CLASS_TOTAL_INCREASING, icon="mdi:radio-tower"),
+    ),
+    (
+        CONF_LAST_PULSES,
+        "set_last_pulses_sensor",
+        dict(accuracy_decimals=0, icon="mdi:pulse"),
+    ),
+    (
+        CONF_LAST_MAX_US,
+        "set_last_max_us_sensor",
+        dict(unit_of_measurement="us", accuracy_decimals=0, icon="mdi:arrow-expand-horizontal"),
     ),
 )
 

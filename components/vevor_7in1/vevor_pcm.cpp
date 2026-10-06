@@ -125,6 +125,16 @@ Status PcmAssembler::push(const int32_t *runs, size_t count) {
   if (bits_.size() < kMaxBits)
     bits_.resize(kMaxBits);
 
+  // Sonde : ce que le récepteur vient de livrer.
+  stats_.last_runs = static_cast<uint32_t>(count);
+  stats_.last_max_us = 0;
+  for (size_t i = 0; i < count; i++) {
+    const int32_t d = runs[i] < 0 ? -runs[i] : runs[i];
+    if (d > stats_.last_max_us)
+      stats_.last_max_us = d;
+  }
+  stats_.total_runs += count;
+
   for (size_t i = 0; i < count; i++) {
     const int32_t d = runs[i] < 0 ? -runs[i] : runs[i];
     if (d <= 0)

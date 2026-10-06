@@ -32,10 +32,9 @@ wifi:
   password: !secret wifi_password
   # Adresse fixe imposee. Aucune section 'ap:' : pas de repli Access Point.
   use_address: 172.16.0.205
-  # Puissance TX du Wi-Fi au minimum. 8.5 est la borne basse acceptee, et le
-  # suffixe 'dB' n'est valide que sur le composant wifi (cv.decibel). Le
-  # output_power du CC1101, lui, est un flottant nu en dBm sans unite.
-  output_power: 8.5dB
+  # Puissance TX Wi-Fi volontairement reduite : emettre moins fort limite le
+  # brouillage du recepteur CC1101 en 868 MHz. Ecriture SANS suffixe d'unite.
+  output_power: 8.5
 
 external_components:
   - source: github://WizardPC/vevor-7-in-1-haos@main
@@ -116,6 +115,12 @@ sensor:
       name: "Vevor trames rejetees"
     bit_period:
       name: "Vevor periode de bit"
+    captures:
+      name: "Vevor captures RMT"
+    last_pulses:
+      name: "Vevor impulsions dernier lot"
+    last_max_us:
+      name: "Vevor impulsion la plus longue"
 
     # Entites non numeriques
     battery_low:

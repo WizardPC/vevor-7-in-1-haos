@@ -4,3 +4,5 @@ zig-out/
 secrets.yaml
 .pio/
 .esphome/
+__pycache__/
+*.pyc

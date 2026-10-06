@@ -16,7 +16,7 @@ Le décodage est un portage C++ du décodeur rtl_433
 | Tests hôte sur trame de référence réelle | ✅ 40 vérifications, 0 échec |
 | Composant ESPHome (`__init__.py`, `sensor.py`, liaison `remote_receiver`) | ✅ écrit |
 | YAML cible | ✅ `esphome config` : *Configuration is valid!* (ESPHome 2026.9.1) |
-| Compilation esp-idf | ⏳ en cours |
+| Compilation esp-idf | ✅ réussie — RAM 33,1 % (106 410 o), Flash 43,6 % (800 114 o) |
 | Capture réelle depuis le matériel | ⏳ à faire (déterminera la fréquence réelle) |
 
 ## Structure

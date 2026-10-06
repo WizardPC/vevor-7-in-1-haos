@@ -32,6 +32,13 @@ from esphome.const import (
 
 from . import Vevor7in1Component
 
+# AUTO_LOAD doit vivre ICI et pas seulement dans __init__.py : quand un composant
+# n'est chargé que comme plateforme (pas de bloc « hub »), c'est le module de
+# plateforme que lit ESPHome. Or chaque domaine d'entité doit exister comme clé
+# de premier niveau pour que ses sources soient copiées dans le build (sinon
+# entity_includes.h inclut un text_sensor.h absent). Voir README.
+AUTO_LOAD = ["sensor", "binary_sensor", "text_sensor"]
+
 CONF_REMOTE_RECEIVER_ID = "remote_receiver_id"
 
 CONF_TEMPERATURE = "temperature"

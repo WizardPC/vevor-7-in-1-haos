@@ -3,3 +3,4 @@ zig-out/
 .venv/
 secrets.yaml
 .pio/
+.esphome/

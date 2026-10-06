@@ -1,0 +1,5 @@
+zig-out/
+*.o
+.venv/
+secrets.yaml
+.pio/

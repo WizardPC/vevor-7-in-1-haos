@@ -1,0 +1,112 @@
+# ---------------------------------------------------------------------------
+# Vevor 7-in-1 (868 MHz) -> Home Assistant, via CC1101 + ESP32-C3 SuperMini.
+#
+# Ce fichier ne contient AUCUNE logique métier : uniquement le câblage, les logs
+# et la déclaration des entités. Tout le décodage vit dans le composant externe
+# components/vevor_7in1/.
+# ---------------------------------------------------------------------------
+
+esphome:
+  name: vevor-7in1
+  friendly_name: Vevor 7-in-1
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: esp-idf
+
+logger:
+  level: DEBUG
+
+# Pas d'encryption (développement).
+api:
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  # Adresse fixe imposee. Aucune section 'ap:' : pas de repli Access Point.
+  use_address: 172.16.0.205
+
+external_components:
+  - source: github://WizardPC/vevor-7-in-1-haos@main
+    components: [vevor_7in1]
+    refresh: 0s
+
+# --- Bus SPI (impose) -------------------------------------------------------
+spi:
+  clk_pin: GPIO4
+  mosi_pin: GPIO6
+  miso_pin: GPIO5
+  cs_pin:
+    number: GPIO7
+
+# --- Radio CC1101 -----------------------------------------------------------
+# Mode async (par defaut) : le CC1101 demodule et sort le signal sur GDO0,
+# capture par le remote_receiver ci-dessous.
+cc1101:
+  cs_pin: GPIO7
+  # HYPOTHESE : la source rtl_433 ne documente un centre mesure que pour la
+  # variante US (915.031 MHz). A confirmer par une capture reelle.
+  frequency: 868.35MHz
+  modulation_type: 2-FSK
+  symbol_rate: 11260        # ~11.26 kbaud
+  fsk_deviation: 37kHz      # +-37 kHz
+  filter_bandwidth: 101kHz  # ~2 x (deviation + debit/2)
+  output_power: 8.5         # float en dBm (-30..11) ; sans effet en reception
+  packet_mode: false        # mode async
+
+# --- Capture des timings bruts (GDO0) ---------------------------------------
+remote_receiver:
+  id: rf_receiver
+  pin:
+    number: GPIO3
+  dump: raw                 # outil de mise au point : a retirer en production
+  idle: 9ms                 # equivalent du reset_limit rtl_433 (9000 us)
+
+# --- Entites exposees a Home Assistant --------------------------------------
+sensor:
+  - platform: vevor_7in1
+    remote_receiver_id: rf_receiver
+
+    # Donnees de la station
+    temperature:
+      name: "Vevor temperature"
+    humidity:
+      name: "Vevor humidite"
+    wind_speed:
+      name: "Vevor vent moyen"
+    wind_gust:
+      name: "Vevor rafale"
+    wind_direction:
+      name: "Vevor direction du vent"
+    rain_total:
+      name: "Vevor pluie cumulee"
+    uv_index:
+      name: "Vevor indice UV"
+    illuminance:
+      name: "Vevor luminosite"
+    battery_low:
+      name: "Vevor batterie faible"
+
+    # Diagnostic
+    frame_age:              # watchdog : secondes depuis la derniere trame valide
+      name: "Vevor age derniere trame"
+    signal_quality:         # ratio de trames conformes / trames attendues
+      name: "Vevor qualite du signal"
+    frames_valid:
+      name: "Vevor trames valides"
+    frames_invalid:
+      name: "Vevor trames rejetees"
+    bit_period:
+      name: "Vevor periode de bit"
+
+text_sensor:
+  - platform: vevor_7in1
+    remote_receiver_id: rf_receiver
+    station_id:
+      name: "Vevor identifiant"
+    last_status:
+      name: "Vevor dernier statut"

@@ -32,6 +32,10 @@ wifi:
   password: !secret wifi_password
   # Adresse fixe imposee. Aucune section 'ap:' : pas de repli Access Point.
   use_address: 172.16.0.205
+  # Puissance TX du Wi-Fi au minimum. 8.5 est la borne basse acceptee, et le
+  # suffixe 'dB' n'est valide que sur le composant wifi (cv.decibel). Le
+  # output_power du CC1101, lui, est un flottant nu en dBm sans unite.
+  output_power: 8.5dB
 
 external_components:
   - source: github://WizardPC/vevor-7-in-1-haos@main
@@ -63,7 +67,6 @@ cc1101:
   symbol_rate: 11260        # ~11.26 kbaud
   fsk_deviation: 37kHz      # +-37 kHz
   filter_bandwidth: 101kHz  # ~2 x (deviation + debit/2)
-  output_power: 8.5         # float en dBm (-30..11) ; sans effet en reception
   packet_mode: false
 
 # --- Capture des timings bruts (GDO0) ---------------------------------------

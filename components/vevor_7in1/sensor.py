@@ -208,10 +208,15 @@ async def to_code(config):
     await cg.register_component(var, config)
 
     # Le lien avec le CC1101 est matériel ; côté logiciel, le remote_receiver est
-    # la source des timings. L'enregistrement passe obligatoirement par ici :
-    # la place de listener est comptée à la génération de code.
+    # la source des timings.
     receiver = await cg.get_variable(config[CONF_REMOTE_RECEIVER_ID])
-    remote_base.add_listener(receiver, var)
+    if hasattr(remote_base, "add_listener"):
+        # Branche de développement : la place de listener est comptée ici même.
+        remote_base.add_listener(receiver, var)
+    else:
+        # Branche stable : remote_base.register_listener() pousse directement
+        # dans le vecteur de listeners du receiver.
+        cg.add(receiver.register_listener(var))
 
     for key, setter, _ in _SENSORS:
         if key in config:

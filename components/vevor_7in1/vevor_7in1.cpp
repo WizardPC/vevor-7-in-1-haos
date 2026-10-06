@@ -2,6 +2,8 @@
 
 namespace esphome::vevor_7in1 {
 
+static const char *const TAG = "vevor_7in1";
+
 // Cadence nominale d'émission de la station : une trame toutes les 20 s
 // (documenté dans rtl_433/src/devices/vevor_7in1.c). Sert de dénominateur au
 // calcul de la qualité du signal.
